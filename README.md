@@ -16,7 +16,7 @@ Football REST API is a sample API that allows you manage your football teams.
 - CQRS from scratch.
 	- You really don't need Mediatr. Remove indirection and magic while improving performance with basic DI instead.
 
-## Install
+## Install and Run
 
 1. Clone this repository
 
@@ -34,4 +34,15 @@ Football REST API is a sample API that allows you manage your football teams.
 
    ```
    dotnet run --launch-profile http
+   ```
+
+4. API will be listening on
+
+   ```
+   http://localhost:5030
+   ```
+
+   Swagger Page
+   ```
+   http://localhost:5030/swagger/index.html
    ```
