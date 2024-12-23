@@ -28,11 +28,9 @@ public class CreatePlayerCommandHandler : IRequestHandler<CreatePlayerCommand, P
             request.Nationality
         );
 
-        db.Insert(player);
+        var response = db.Insert(player).Map(_ => player.ToResponse());
 
-        var response = player.ToResponse();
-
-        return Task.FromResult(new ResultOf<PlayerResponse>(response));
+        return Task.FromResult(response);
     }
 }
 

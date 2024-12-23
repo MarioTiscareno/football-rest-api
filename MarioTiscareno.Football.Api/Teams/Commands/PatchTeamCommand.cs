@@ -36,7 +36,7 @@ public class PatchTeamCommandHandler : IRequestHandler<PatchTeamCommand, Unit>
             })
             .Bind(p => db.Update(p));
 
-        return Task.FromResult(result);
+        return result.ToResultAsync();
     }
 }
 

@@ -38,7 +38,7 @@ public class PatchPlayerCommandHandler : IRequestHandler<PatchPlayerCommand, Uni
             })
             .Bind(p => db.Update(p));
 
-        return Task.FromResult(result);
+        return result.ToResultAsync();
     }
 }
 

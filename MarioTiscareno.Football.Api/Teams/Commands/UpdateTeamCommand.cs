@@ -24,9 +24,9 @@ public class UpdateTeamCommandHandler : IRequestHandler<UpdateTeamCommand, Unit>
         CancellationToken cancellationToken = default
     )
     {
-        db.Update(new Team(request.Id, request.Name, request.Country, request.League));
+        var result = db.Update(new Team(request.Id, request.Name, request.Country, request.League));
 
-        return Task.FromResult(new ResultOf<Unit>(Unit.Value));
+        return Task.FromResult(result);
     }
 }
 

@@ -25,7 +25,7 @@ public class UpdatePlayerCommandHandler : IRequestHandler<UpdatePlayerCommand, U
         CancellationToken cancellationToken = default
     )
     {
-        db.Update(
+        var result = db.Update(
             new Player(
                 request.Id,
                 request.Name,
@@ -35,7 +35,7 @@ public class UpdatePlayerCommandHandler : IRequestHandler<UpdatePlayerCommand, U
             )
         );
 
-        return Task.FromResult(new ResultOf<Unit>(Unit.Value));
+        return Task.FromResult(result);
     }
 }
 

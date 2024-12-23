@@ -27,11 +27,9 @@ public class CreateTeamCommandHandler : IRequestHandler<CreateTeamCommand, TeamR
             request.League
         );
 
-        db.Insert(team);
+        var response = db.Insert(team).Map(_ => team.ToResponse());
 
-        var response = team.ToResponse();
-
-        return Task.FromResult(new ResultOf<TeamResponse>(response));
+        return Task.FromResult(response);
     }
 }
 
