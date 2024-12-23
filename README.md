@@ -46,3 +46,12 @@ Football REST API is a sample API that allows you manage your football teams.
    ```
    http://localhost:5030/swagger/index.html
    ```
+
+## Run Tests
+
+1. After installation go to tests project folder 'MarioTiscareno.Football.Api.Tests.Unit'
+2. Run tests
+
+   ```
+   dotnet test .
+   ```
