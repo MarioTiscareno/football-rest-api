@@ -106,13 +106,7 @@ public static class PlayerEndpoints
                 UpdatePlayerCommandHandler handler
             ) =>
             {
-                var result = await pipeline.RunAsync(
-                    command with
-                    {
-                        Id = id
-                    },
-                    handler.HandleAsync
-                );
+                var result = await pipeline.RunAsync(command with { Id = id }, handler.HandleAsync);
 
                 return result.Match(
                     _ => Results.NoContent(),
@@ -140,13 +134,7 @@ public static class PlayerEndpoints
                 PatchPlayerCommandHandler handler
             ) =>
             {
-                var result = await pipeline.RunAsync(
-                    command with
-                    {
-                        Id = id
-                    },
-                    handler.HandleAsync
-                );
+                var result = await pipeline.RunAsync(command with { Id = id }, handler.HandleAsync);
 
                 return result.Match(
                     _ => Results.NoContent(),

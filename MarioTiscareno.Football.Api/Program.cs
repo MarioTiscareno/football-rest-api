@@ -4,6 +4,7 @@ using MarioTiscareno.Football.Api.Core;
 using MarioTiscareno.Football.Api.Market;
 using MarioTiscareno.Football.Api.Players;
 using MarioTiscareno.Football.Api.Teams;
+using Serilog;
 
 namespace MarioTiscareno.Football.Api;
 
@@ -11,59 +12,71 @@ public static class Program
 {
     public static void Main(string[] args)
     {
-        WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+        Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
 
-        // Add services to the container.
-        builder.Services.AddAuthorization();
-
-        // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-        builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen(
-            opt => opt.TagActionsBy(d => [d.RelativePath?.Split('/')[2]])
-        );
-
-        builder.Services.AddScoped(_ => new LiteDatabase("football.db"));
-        builder.Services.AddScoped<IPlayerDb, PlayerDb>();
-        builder.Services.AddScoped<ITeamDb, TeamDb>();
-        builder.Services.AddScoped<IMarketDb, MarketDb>();
-        builder.Services.AddSingleton<RequestPipeline>();
-        builder.Services.AddRequestHandlers();
-        builder.Services.AddValidators();
-
-        builder
-            .Services.AddApiVersioning(opt =>
-            {
-                opt.DefaultApiVersion = new(1, 0);
-                opt.ReportApiVersions = true;
-            })
-            .AddApiExplorer(opt =>
-            {
-                opt.GroupNameFormat = "'v'V";
-                opt.SubstituteApiVersionInUrl = true;
-            });
-
-        WebApplication app = builder.Build();
-
-        // Configure the HTTP request pipeline.
-        if (app.Environment.IsDevelopment())
+        try
         {
-            app.UseSwagger();
-            app.UseSwaggerUI();
+            WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+            builder.Services.AddSerilog();
+
+            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen(
+                opt => opt.TagActionsBy(d => [d.RelativePath?.Split('/')[2]])
+            );
+
+            builder.Services.AddScoped(_ => new LiteDatabase("football.db"));
+            builder.Services.AddScoped<IPlayerDb, PlayerDb>();
+            builder.Services.AddScoped<ITeamDb, TeamDb>();
+            builder.Services.AddScoped<IMarketDb, MarketDb>();
+            builder.Services.AddSingleton<RequestPipeline>();
+            builder.Services.AddRequestHandlers();
+            builder.Services.AddValidators();
+
+            builder
+                .Services.AddApiVersioning(opt =>
+                {
+                    opt.DefaultApiVersion = new(1, 0);
+                    opt.ReportApiVersions = true;
+                })
+                .AddApiExplorer(opt =>
+                {
+                    opt.GroupNameFormat = "'v'V";
+                    opt.SubstituteApiVersionInUrl = true;
+                });
+
+            WebApplication app = builder.Build();
+
+            // Configure the HTTP request pipeline.
+            if (app.Environment.IsDevelopment())
+            {
+                app.UseSwagger();
+                app.UseSwaggerUI();
+            }
+
+            app.MapPlayerEndpoints();
+            app.MapTeamEndpoints();
+
+            // Disable FluentValidation localized error messages
+            ValidatorOptions.Global.LanguageManager.Enabled = false;
+
+            app.UseExceptionHandler(
+                builder => builder.Run(GlobalExceptionHandler.HandleExceptionAsync)
+            );
+
+            app.SeedDatabase();
+
+            app.Run();
         }
-
-        app.UseHttpsRedirection();
-
-        app.UseAuthorization();
-
-        app.MapPlayerEndpoints();
-        app.MapTeamEndpoints();
-
-        // Disable FluentValidation localized error messages
-        ValidatorOptions.Global.LanguageManager.Enabled = false;
-
-        app.SeedDatabase();
-
-        app.Run();
+        catch (Exception ex)
+        {
+            Log.Fatal(ex, "Application terminated unexpectedly");
+        }
+        finally
+        {
+            Log.CloseAndFlush();
+        }
     }
 }
 

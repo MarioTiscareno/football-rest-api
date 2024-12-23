@@ -6,9 +6,12 @@ public class RequestPipeline
 {
     private readonly IServiceProvider sp;
 
-    public RequestPipeline(IServiceProvider sp)
+    private readonly ILogger logger;
+
+    public RequestPipeline(IServiceProvider sp, ILogger<RequestPipeline> logger)
     {
         this.sp = sp;
+        this.logger = logger;
     }
 
     public async Task<ResultOf<TResponse>> RunAsync<TRequest, TResponse>(
@@ -18,6 +21,8 @@ public class RequestPipeline
     )
         where TRequest : IRequest<TResponse>
     {
+        logger.LogInformation("Processing request {@Request}", request);
+
         var validator = sp.GetService<IValidator<TRequest>>();
 
         if (validator is not null)
@@ -26,6 +31,8 @@ public class RequestPipeline
 
             if (!validationResult.IsValid)
             {
+                logger.LogWarning("Validation failed {@ValidationErrors}", validationResult.Errors);
+
                 return new ValidationError(
                     validationResult
                         .Errors.GroupBy(e => e.PropertyName)
@@ -34,7 +41,15 @@ public class RequestPipeline
             }
         }
 
-        return await handler(request, ct);
+        var result = await handler(request, ct);
+
+        logger.LogInformation(
+            "Finished processing request {@Request} with result {@Result}",
+            request,
+            result
+        );
+
+        return result;
     }
 }
 
