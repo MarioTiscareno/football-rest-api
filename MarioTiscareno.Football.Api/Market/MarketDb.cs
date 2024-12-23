@@ -80,62 +80,6 @@ public class MarketDb : IMarketDb
         }
     }
 
-    /// <summary>
-    /// Drops a player from a team
-    /// </summary>
-    /// <param name="playerId"></param>
-    /// <param name="teamId"></param>
-    /// <returns></returns>
-    public ResultOf<Unit> DropPlayer(string playerId, string teamId)
-    {
-        try
-        {
-            db.BeginTrans();
-
-            var player = players.FindById(playerId);
-
-            // if the player is not found, we return an error
-            if (player is null)
-            {
-                var error = new InvalidMarketOperationError(
-                    $"Failed to drop player {playerId} from team {teamId} because the player was not found."
-                );
-                return new ResultOf<Unit>(error);
-            }
-
-            var team = teams.FindById(teamId);
-
-            // if the team is not found, we return an error
-            if (team is null)
-            {
-                var error = new InvalidMarketOperationError(
-                    $"Failed to drop player {playerId} from team {teamId} because the team was not found."
-                );
-                return new ResultOf<Unit>(error);
-            }
-
-            if (!team.Players.Any(p => p.Id == playerId))
-            {
-                var error = new InvalidMarketOperationError(
-                    $"Failed to drop player {playerId} from team {teamId} because the player does not belong to the team."
-                );
-                return new ResultOf<Unit>(error);
-            }
-
-            team.Players.Remove(player);
-            teams.Update(team);
-
-            db.Commit();
-
-            return Unit.CreateResult();
-        }
-        catch (Exception)
-        {
-            db.Rollback();
-            throw;
-        }
-    }
-
     public ResultOf<Unit> DropPlayer(Player player, Team team)
     {
         try
