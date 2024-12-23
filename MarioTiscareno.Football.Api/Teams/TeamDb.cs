@@ -38,16 +38,14 @@ public class TeamDb : ITeamDb
 
     public ResultOf<Unit> Delete(string id)
     {
-        return teams.Delete(id)
-            ? Unit.Value
-            : new ResultOf<Unit>(new NotFoundInDbError("teams", id));
+        return teams.Delete(id) ? Unit.Value : new NotFoundInDbError("teams", id);
     }
 
     public ResultOf<Team> Get(string id)
     {
         var team = teams.Include(t => t.Players).FindById(id);
 
-        return team is null ? new ResultOf<Team>(new NotFoundInDbError("teams", id)) : team;
+        return team is null ? new NotFoundInDbError("teams", id) : team;
     }
 
     public ResultOf<Unit> Insert(Team team)
@@ -59,9 +57,7 @@ public class TeamDb : ITeamDb
 
     public ResultOf<Unit> Update(Team team)
     {
-        return teams.Update(team)
-            ? Unit.Value
-            : new ResultOf<Unit>(new NotFoundInDbError("teams", team.Id));
+        return teams.Update(team) ? Unit.Value : new NotFoundInDbError("teams", team.Id);
     }
 
     public ResultOf<Unit> Upsert(Team team)

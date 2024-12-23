@@ -38,16 +38,14 @@ public sealed class PlayerDb : IPlayerDb
 
     public ResultOf<Unit> Delete(string id)
     {
-        return players.Delete(id)
-            ? Unit.Value
-            : new ResultOf<Unit>(new NotFoundInDbError("players", id));
+        return players.Delete(id) ? Unit.Value : new NotFoundInDbError("players", id);
     }
 
     public ResultOf<Player> Get(string id)
     {
         var player = players.FindById(id);
 
-        return player is null ? new ResultOf<Player>(new NotFoundInDbError("players", id)) : player;
+        return player is null ? new NotFoundInDbError("players", id) : player;
     }
 
     public ResultOf<Unit> Insert(Player player)
@@ -59,9 +57,7 @@ public sealed class PlayerDb : IPlayerDb
 
     public ResultOf<Unit> Update(Player player)
     {
-        return players.Update(player)
-            ? Unit.Value
-            : new ResultOf<Unit>(new NotFoundInDbError("players", player.Id));
+        return players.Update(player) ? Unit.Value : new NotFoundInDbError("players", player.Id);
     }
 
     public ResultOf<Unit> Upsert(Player player)
